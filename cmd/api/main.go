@@ -6,13 +6,63 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/liciomatos/demo-app-api/docs" // Importa os arquivos gerados pelo swag
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title           Demo App API
+// @version         1.0
+// @description     Uma API simples para demonstração de deploy em Minikube.
+// @host            localhost:8080
+// @BasePath        /
+// @schemes         http
 type Response struct {
 	Message string `json:"message"`
 	Version string `json:"version"`
 }
 
+// @Summary      Obter informação principal
+// @Description  Retorna uma mensagem de boas-vindas e a versão da API
+// @Tags         info
+// @Produce      json
+// @Success      200  {object}  Response
+// @Router       / [get]
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	response := Response{
+		Message: "Bem-vindo à Demo API",
+		Version: "1.0.0",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// @Summary      Verificação de saúde
+// @Description  Endpoint para verificar se a API está funcionando
+// @Tags         health
+// @Produce      plain
+// @Success      200  {string}  string  "OK"
+// @Router       /health [get]
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
+// @title           Demo App API
+// @version         1.0
+// @description     Uma API simples para demonstração
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8080
+// @BasePath  /
 func main() {
 	// Configuração da porta da API
 	port := os.Getenv("PORT")
@@ -20,24 +70,17 @@ func main() {
 		port = "8080"
 	}
 
-	// Handler para a rota principal
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		response := Response{
-			Message: "Bem-vindo à Demo API",
-			Version: "1.0.0",
-		}
+	// Configurar rotas
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/health", healthHandler)
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	})
-
-	// Handler para verificação de saúde
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
-	})
+	// Adicionar handler para o Swagger UI
+	http.HandleFunc("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:"+port+"/swagger/doc.json"),
+	))
 
 	// Iniciar o servidor
 	fmt.Printf("Servidor rodando na porta %s...\n", port)
+	fmt.Printf("Documentação Swagger disponível em http://localhost:%s/swagger/index.html\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
