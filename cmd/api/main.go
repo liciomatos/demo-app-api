@@ -16,7 +16,7 @@ import (
 // @description     Uma API simples para demonstração de deploy em Minikube.
 // @host            localhost:8080
 // @BasePath        /
-// @schemes         http
+// @schemes         http https
 type Response struct {
 	Message string `json:"message"`
 	Version string `json:"version"`
@@ -76,11 +76,11 @@ func main() {
 
 	// Adicionar handler para o Swagger UI
 	http.HandleFunc("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:"+port+"/swagger/doc.json"),
+		httpSwagger.URL("/swagger/doc.json"), // URL relativa, não depende de hostname
 	))
 
 	// Iniciar o servidor
 	fmt.Printf("Servidor rodando na porta %s...\n", port)
-	fmt.Printf("Documentação Swagger disponível em http://localhost:%s/swagger/index.html\n", port)
+	fmt.Printf("Documentação Swagger disponível em /swagger/index.html\n")
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
