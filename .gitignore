@@ -1,0 +1,31 @@
+# Binários compilados
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Arquivos de teste
+*.test
+*.out
+
+# Diretórios do Go
+/vendor/
+/Godeps/
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Minikube
+.minikube/
+
+# Logs
+*.log 
