@@ -4,8 +4,7 @@ WORKDIR /app
 
 # Copiar arquivos de dependências
 COPY go.mod ./
-COPY go.sum ./
-RUN go mod download
+RUN go mod download || true
 
 # Copiar o código da aplicação
 COPY . .
