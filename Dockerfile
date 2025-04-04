@@ -4,7 +4,8 @@ WORKDIR /app
 
 # Copiar arquivos de dependências
 COPY go.mod ./
-RUN go mod download || true
+COPY go.sum ./
+RUN go mod download
 
 # Copiar o código da aplicação
 COPY . .
@@ -19,6 +20,8 @@ WORKDIR /app
 
 # Copiar o binário compilado
 COPY --from=builder /app/api .
+# Copiar os arquivos de documentação Swagger
+COPY --from=builder /app/docs/swagger.json /app/docs/swagger.json
 
 # Porta que a aplicação vai escutar
 EXPOSE 8080

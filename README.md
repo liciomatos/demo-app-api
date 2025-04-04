@@ -14,6 +14,7 @@ Uma API simples em Go para demonstração de deploy em Minikube utilizando CI/CD
 ```
 ├── cmd/
 │   └── api/        # Código principal da API
+├── docs/           # Documentação Swagger
 ├── k8s/            # Manifestos Kubernetes
 ├── pkg/            # Pacotes reutilizáveis
 ├── scripts/        # Scripts auxiliares
@@ -38,6 +39,22 @@ Uma API simples em Go para demonstração de deploy em Minikube utilizando CI/CD
    ./scripts/deploy-local.sh
    ```
 
+## Documentação da API (Swagger)
+
+A API inclui documentação interativa usando Swagger UI:
+
+1. Quando a API estiver em execução, acesse:
+   ```
+   http://localhost:8080/swagger/index.html
+   ```
+
+2. A documentação Swagger permite testar os endpoints diretamente na interface.
+
+3. Para atualizar a documentação após modificações na API:
+   ```
+   swag init -g cmd/api/main.go
+   ```
+
 ## CI/CD
 
 O projeto utiliza GitHub Actions para CI/CD:
@@ -59,6 +76,9 @@ O projeto utiliza GitHub Actions para CI/CD:
    
    # Verificação de saúde
    curl http://<service-url>/health
+   
+   # Documentação Swagger
+   http://<service-url>/swagger/index.html
    ```
 
 ## Customização
