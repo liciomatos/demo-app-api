@@ -21,7 +21,7 @@ WORKDIR /app
 # Copiar o binário compilado
 COPY --from=builder /app/api .
 # Copiar os arquivos de documentação Swagger
-COPY --from=builder /app/docs/swagger.json /app/docs/swagger.json
+COPY --from=builder /app/docs /app/docs
 
 # Porta que a aplicação vai escutar
 EXPOSE 8080

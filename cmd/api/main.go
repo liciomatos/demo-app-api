@@ -6,9 +6,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	_ "github.com/liciomatos/demo-app-api/docs" // Importa os arquivos gerados pelo swag
 	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/swaggo/swag"
 )
 
 // @title           Demo App API
@@ -49,6 +51,22 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
+// Criando handler para servir o swagger.json diretamente
+func swaggerJSONHandler(w http.ResponseWriter, r *http.Request) {
+	doc, err := swag.ReadDoc()
+	if err != nil {
+		http.Error(w, "Erro ao ler a documentação Swagger", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(doc))
+}
+
+// Criando handler para servir o arquivo swagger.json estático
+func staticSwaggerJSONHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, filepath.Join("docs", "swagger.json"))
+}
+
 // @title           Demo App API
 // @version         1.0
 // @description     Uma API simples para demonstração
@@ -74,13 +92,18 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/health", healthHandler)
 
-	// Adicionar handler para o Swagger UI
+	// Adicionar handlers para o Swagger
+	http.HandleFunc("/swagger.json", swaggerJSONHandler)              // Gerado dinamicamente
+	http.HandleFunc("/static-swagger.json", staticSwaggerJSONHandler) // Arquivo estático
+
+	// Handler para a UI do Swagger
 	http.HandleFunc("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("/swagger/doc.json"), // URL relativa, não depende de hostname
+		httpSwagger.URL("/swagger.json"),
 	))
 
 	// Iniciar o servidor
 	fmt.Printf("Servidor rodando na porta %s...\n", port)
 	fmt.Printf("Documentação Swagger disponível em /swagger/index.html\n")
+	fmt.Printf("Arquivo swagger.json disponível em /swagger.json e /static-swagger.json\n")
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
